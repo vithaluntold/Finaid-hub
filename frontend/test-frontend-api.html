@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: #22c55e; font-weight: bold; }
+        .error { color: #ef4444; font-weight: bold; }
+        .loading { color: #3b82f6; }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+        pre {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            max-height: 400px;
+        }
+        h2 { color: #1e293b; }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .badge-success { background: #dcfce7; color: #15803d; }
+        .badge-error { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Frontend API Connection Tests</h1>
+    <p>Testing all marketplace endpoints from frontend perspective</p>
+
+    <div class="test-section">
+        <h2>Backend Status</h2>
+        <button onclick="checkBackend()">Check Backend</button>
+        <div id="backend-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>1. Finaid Profiles API</h2>
+        <button onclick="testFinaidProfiles()">Test /api/v1/finaid-profiles</button>
+        <div id="finaid-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. User by ID API (RESTful)</h2>
+        <button onclick="testUserById()">Test /api/v1/users/:id</button>
+        <div id="user-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. External Platform API</h2>
+        <button onclick="testExternalAPI()">Test Marketsverse API</button>
+        <div id="external-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Run All Tests</h2>
+        <button onclick="runAllTests()">🚀 Run All Tests</button>
+        <div id="all-results"></div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:9003';
+        const EXTERNAL_API = 'https://finaid.marketsverse.com/api/v1/predictor/get-supported-configs';
+
+        async function checkBackend() {
+            const el = document.getElementById('backend-status');
+            el.innerHTML = '<p class="loading">⏳ Checking backend...</p>';
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/`);
+                const data = await response.json();
+                el.innerHTML = `
+                    <span class="status-badge badge-success">✅ ONLINE</span>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                el.innerHTML = `
+                    <span class="status-badge badge-error">❌ OFFLINE</span>
+                    <p class="error">Error: ${error.message}</p>
+                    <p>Make sure backend is running on port 9003</p>
+                `;
+            }
+        }
+
+        async function testFinaidProfiles() {
+            const el = document.getElementById('finaid-result');
+            el.innerHTML = '<p class="loading">⏳ Fetching finaid profiles...</p>';
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/v1/finaid-profiles`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    el.innerHTML = `
+                        <p class="success">✅ Success! Found ${data.data.length} profiles</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    el.innerHTML = `<p class="error">❌ API returned error: ${data.message}</p>`;
+                }
+            } catch (error) {
+                el.innerHTML = `<p class="error">❌ Request failed: ${error.message}</p>`;
+            }
+        }
+
+        async function testUserById() {
+            const el = document.getElementById('user-result');
+            const userId = '125bfed4-45a2-4773-8173-501974e26692';
+            el.innerHTML = '<p class="loading">⏳ Fetching user data...</p>';
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/v1/users/${userId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    el.innerHTML = `
+                        <p class="success">✅ Success! User found: ${data.data.first_name} ${data.data.last_name}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    el.innerHTML = `<p class="error">❌ API returned error: ${data.message}</p>`;
+                }
+            } catch (error) {
+                el.innerHTML = `<p class="error">❌ Request failed: ${error.message}</p>`;
+            }
+        }
+
+        async function testExternalAPI() {
+            const el = document.getElementById('external-result');
+            el.innerHTML = '<p class="loading">⏳ Fetching platform configs...</p>';
+            
+            try {
+                const response = await fetch(EXTERNAL_API);
+                const data = await response.json();
+                
+                if (data.data) {
+                    const platforms = Object.keys(data.data);
+                    el.innerHTML = `
+                        <p class="success">✅ Success! Found ${platforms.length} platforms</p>
+                        <p><strong>Platforms:</strong> ${platforms.join(', ')}</p>
+                        <pre>${JSON.stringify(data, null, 2).substring(0, 1000)}...</pre>
+                    `;
+                } else {
+                    el.innerHTML = `<p class="error">❌ Unexpected response format</p>`;
+                }
+            } catch (error) {
+                el.innerHTML = `<p class="error">❌ Request failed: ${error.message}</p>`;
+            }
+        }
+
+        async function runAllTests() {
+            const el = document.getElementById('all-results');
+            el.innerHTML = '<p class="loading">⏳ Running all tests...</p>';
+            
+            const results = [];
+            
+            // Test 1: Backend
+            try {
+                await fetch(`${BACKEND_URL}/`);
+                results.push('✅ Backend: Connected');
+            } catch (e) {
+                results.push('❌ Backend: Failed - ' + e.message);
+            }
+            
+            // Test 2: Finaid Profiles
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/v1/finaid-profiles`);
+                const data = await res.json();
+                results.push(`✅ Finaid Profiles: ${data.data.length} profiles found`);
+            } catch (e) {
+                results.push('❌ Finaid Profiles: Failed - ' + e.message);
+            }
+            
+            // Test 3: User by ID
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/v1/users/125bfed4-45a2-4773-8173-501974e26692`);
+                const data = await res.json();
+                results.push(`✅ User by ID: ${data.data.first_name} ${data.data.last_name}`);
+            } catch (e) {
+                results.push('❌ User by ID: Failed - ' + e.message);
+            }
+            
+            // Test 4: External API
+            try {
+                const res = await fetch(EXTERNAL_API);
+                const data = await res.json();
+                const platforms = Object.keys(data.data);
+                results.push(`✅ External API: ${platforms.length} platforms available`);
+            } catch (e) {
+                results.push('❌ External API: Failed - ' + e.message);
+            }
+            
+            const summary = results.filter(r => r.startsWith('✅')).length;
+            const total = results.length;
+            
+            el.innerHTML = `
+                <h3>Test Results: ${summary}/${total} Passed</h3>
+                <ul>
+                    ${results.map(r => `<li>${r}</li>`).join('')}
+                </ul>
+                <p><strong>Status:</strong> ${summary === total ? 
+                    '<span class="success">All tests passed! 🎉</span>' : 
+                    '<span class="error">Some tests failed</span>'}</p>
+            `;
+        }
+
+        // Auto-run backend check on load
+        window.addEventListener('load', () => {
+            checkBackend();
+        });
+    </script>
+</body>
+</html>

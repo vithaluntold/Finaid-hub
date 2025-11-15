@@ -1,0 +1,17 @@
+# Backend .dockerignore
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+.env.development
+.env.test
+.env.local
+*.md
+test-*.js
+tests/
+test-results.json
+run-tests*
+*.bat

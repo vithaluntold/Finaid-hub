@@ -1,0 +1,181 @@
+{
+  "timestamp": "2025-11-06T13:54:21.128Z",
+  "duration": "1.12 seconds",
+  "results": {
+    "passed": 9,
+    "failed": 24,
+    "total": 33,
+    "failedTests": [
+      {
+        "name": "GET /api/v1/users/profile - Get user profile",
+        "expected": "profile data returned",
+        "actual": "profile fetch failed",
+        "error": null
+      },
+      {
+        "name": "PUT /api/v1/users/profile - Update user profile",
+        "expected": "profile updated successfully",
+        "actual": "profile update failed",
+        "error": null
+      },
+      {
+        "name": "GET /api/v1/user/get-user-info - Get user info",
+        "expected": "user info returned",
+        "actual": "user info failed",
+        "error": null
+      },
+      {
+        "name": "GET /api/v1/admins/users/by-superadmin - List admin users (Super Admin)",
+        "expected": "admin users list returned",
+        "actual": "admin users list failed",
+        "error": null
+      },
+      {
+        "name": "GET /api/v1/licenses/my-licenses - Get user licenses",
+        "expected": "licenses data returned",
+        "actual": "licenses fetch failed",
+        "error": null
+      },
+      {
+        "name": "GET /api/v1/licenses/my-licenses/accountant - Get accountant licenses",
+        "expected": "accountant licenses returned",
+        "actual": "accountant licenses failed",
+        "error": null
+      },
+      {
+        "name": "GET /api/v1/finaid-profiles - Get all profiles",
+        "expected": "profiles array returned",
+        "actual": "profiles fetch failed",
+        "error": null
+      },
+      {
+        "name": "GET /api/v1/finaid-profiles/filter - Filter profiles",
+        "expected": "filtered profiles returned",
+        "actual": "filter failed",
+        "error": null
+      },
+      {
+        "name": "POST /api/v1/finaid-profiles - Create profile (Admin)",
+        "expected": "profile created successfully",
+        "actual": "profile creation failed",
+        "error": null
+      },
+      {
+        "name": "GET /api/v1/clients - Get clients list",
+        "expected": "clients list returned",
+        "actual": "clients fetch failed",
+        "error": null
+      },
+      {
+        "name": "POST /api/v1/clients - Create new client",
+        "expected": "client created successfully",
+        "actual": "client creation failed",
+        "error": null
+      },
+      {
+        "name": "GET /api/v1/client-companies - Get client companies",
+        "expected": "companies list returned",
+        "actual": "companies fetch failed",
+        "error": null
+      },
+      {
+        "name": "GET /api/v1/quickbooks/authorize - QB authorization",
+        "expected": "QB auth URL returned",
+        "actual": "QB auth failed",
+        "error": null
+      },
+      {
+        "name": "POST /api/v1/quickbooks/vendors - Get QB vendors",
+        "expected": "QB vendors data handled",
+        "actual": "QB vendors failed",
+        "error": null
+      },
+      {
+        "name": "POST /api/v1/quickbooks/unified/payees - Get unified payees",
+        "expected": "unified payees returned",
+        "actual": "unified payees failed",
+        "error": null
+      },
+      {
+        "name": "GET /api/v1/finaid-agent/runs/company/:clientID - Get AI runs",
+        "expected": "AI runs data returned",
+        "actual": "AI runs fetch failed",
+        "error": null
+      },
+      {
+        "name": "POST /api/v1/finaid-agent/vector/index - Index documents",
+        "expected": "documents indexed successfully",
+        "actual": "indexing failed",
+        "error": null
+      },
+      {
+        "name": "GET /api/v1/finaid-agent/vector/get - Vector search",
+        "expected": "search results returned",
+        "actual": "search failed",
+        "error": null
+      },
+      {
+        "name": "POST /api/v1/post-agent/quickbooks - QB AI analysis",
+        "expected": "AI analysis completed",
+        "actual": "AI analysis failed",
+        "error": null
+      },
+      {
+        "name": "GET /uploads/:filename - File download endpoint",
+        "expected": "file download endpoint responds",
+        "actual": "file download endpoint responds",
+        "error": null
+      },
+      {
+        "name": "GET /api/v1/search - Universal search",
+        "expected": "search results returned",
+        "actual": "search failed",
+        "error": null
+      },
+      {
+        "name": "GET /api/v1/search - Empty search query",
+        "expected": "handles empty search gracefully",
+        "actual": "handles empty search gracefully",
+        "error": null
+      },
+      {
+        "name": "POST /api/v1/test/send-email - Send test email (Admin)",
+        "expected": "email sent successfully",
+        "actual": "email send failed",
+        "error": null
+      },
+      {
+        "name": "Authorization - Invalid JWT token",
+        "expected": "token validation failed",
+        "actual": "unexpected token acceptance",
+        "error": null
+      }
+    ]
+  },
+  "authTokens": [
+    {
+      "type": "superAdmin",
+      "hasToken": true,
+      "tokenLength": 327
+    },
+    {
+      "type": "admin",
+      "hasToken": true,
+      "tokenLength": 311
+    },
+    {
+      "type": "accountant",
+      "hasToken": true,
+      "tokenLength": 324
+    },
+    {
+      "type": "firmOwner",
+      "hasToken": true,
+      "tokenLength": 327
+    }
+  ],
+  "summary": {
+    "successRate": "27.3%",
+    "status": "MULTIPLE_FAILURES"
+  }
+}

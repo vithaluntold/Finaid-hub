@@ -1,0 +1,521 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { DashboardLayout } from "@/components/dashboard-layout";
+
+// Disable static generation for this page
+export const dynamic = 'force-dynamic';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MarketplaceApps } from "@/components/admin/marketplace-apps";
+import { MarketplaceIntegrations } from "@/components/admin/marketplace-integrations";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search, Filter } from "lucide-react";
+import { CreateFinaidProfile } from "@/components/admin/DialogPopups/create-finaid-profile";
+import { backendBaseURL } from "@/assets/constants/constant";
+import axios from "axios";
+import { FinaidProfilesList } from "@/components/admin/finaid-profiles-list";
+import { FinaidProfiles } from "@/components/admin/finaid-profiles";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// Add interfaces for type safety
+interface FilterState extends Record<string, string> {
+  finaid_profile_id: string;
+  status: string;
+  user_id: string;
+  model: string;
+  platform: string;
+}
+
+interface FinaidProfile {
+  _id: string;
+  [key: string]: any;
+}
+
+interface PlatformModel {
+  identifier: string;
+  [key: string]: any;
+}
+
+interface PlatformData {
+  models: PlatformModel[];
+  [key: string]: any;
+}
+
+export default function MarketplacePage() {
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [filters, setFilters] = useState<FilterState>({
+    finaid_profile_id: "",
+    status: "",
+    user_id: "",
+    model: "",
+    platform: "",
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [allFinaidsList, setAllFinaidsList] = useState<string[]>([]);
+  const [localLoading, setLocalLoading] = useState(false);
+
+  const [platformData, setPlatformData] = useState<Record<string, PlatformData>>({});
+  const [selectedPlatformKey, setSelectedPlatformKey] = useState("");
+
+  const toggleDropdown = () => setIsOpen((prev) => !prev);
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // functions
+
+  // async function getAllFinaidList() {
+  //   setIsLoading(true);
+
+  //   try {
+  //     const response = await axios.get(`${backendBaseURL}/api/v1/admin/users`, {
+  //       headers: {
+  //         Authorization: `Bearer ${localStorage?.getItem("accessToken")}`,
+  //       },
+  //     });
+
+  //     setIsLoading(false);
+  //     console.log(response, "Get all finaid admins response");
+  //   } catch (error) {
+  //     setIsLoading(false);
+  //     console.log("Get all finaids profile error", error);
+  //   }
+  // }
+
+  async function getAllFinaidProfiles() {
+    setIsLoading(true);
+
+    try {
+      const response = await axios.get(
+        `${backendBaseURL}/api/v1/finaid-profiles`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage?.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      if (response?.data?.data?.length > 0) {
+        const ids = response?.data?.data?.map((profile: FinaidProfile) => profile._id);
+        setAllFinaidsList(["All", ...ids]);
+      }
+
+      setIsLoading(false);
+      // console.log(response, "Get all finaid profile list response");
+    } catch (error) {
+      setIsLoading(false);
+      console.log("Get all finaids profile error", error);
+    }
+  }
+
+  // renderings
+
+  useEffect(() => {
+    getAllFinaidProfiles();
+    // getAllFinaidList();
+  }, [localLoading]);
+
+  useEffect(() => {
+    const fetchPlatformData = async () => {
+      try {
+        const res = await axios.get(
+          "https://finaid.marketsverse.com/api/v1/predictor/get-supported-configs"
+        );
+        // console.log(res, "test response");
+        setPlatformData(res?.data?.data);
+      } catch (err) {
+        console.error("Error fetching platform data:", err);
+      }
+    };
+
+    fetchPlatformData();
+  }, []);
+
+  const currentPlatform = platformData[selectedPlatformKey];
+
+  return (
+    <DashboardLayout userType="admin">
+      <div className="flex flex-col gap-6">
+        <Tabs defaultValue="finaidprofiles" className="space-y-4">
+          <div className="flex items-center justify-end">
+            {/* <TabsList>
+              <TabsTrigger value="finaidprofiles">Finaid Profiles</TabsTrigger>
+              <TabsTrigger value="apps">Apps</TabsTrigger>
+              <TabsTrigger value="integrations">Integrations</TabsTrigger>
+              <TabsTrigger value="installed">Installed</TabsTrigger>
+            </TabsList> */}
+            <div className="flex gap-2">
+              {/* <Button
+                className=""
+                onClick={() => setIsCreateDialogOpen((prev) => !prev)}
+              >
+                Add New Finaid Profile
+              </Button> */}
+
+              <Button variant="outline" size="icon" className="relative">
+                <div onClick={toggleDropdown}>
+                  <Filter className="h-4 w-4" />
+                  <span className="sr-only">Filter</span>
+                </div>
+                {isOpen && (
+                  <div className="absolute right-0 z-10 mt-2 w-64 rounded-md bg-white border shadow-lg p-4 space-y-2 top-10 flex flex-col">
+                    <Select
+                      value={filters?.finaid_profile_id}
+                      onValueChange={(value) =>
+                        setFilters((prev) => {
+                          return {
+                            ...prev,
+                            finaid_profile_id: value === "All" ? "" : value,
+                          };
+                        })
+                      }
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select Profile ID" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {allFinaidsList?.length > 0 &&
+                          allFinaidsList?.map((eachItem, index) => {
+                            return (
+                              <SelectItem
+                                key={eachItem + index}
+                                value={eachItem}
+                              >
+                                {eachItem}
+                              </SelectItem>
+                            );
+                          })}
+
+                        {/* <SelectItem value="inactive">Inactive</SelectItem> */}
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={filters?.status}
+                      onValueChange={(value) =>
+                        setFilters((prev) => {
+                          return {
+                            ...prev,
+                            status: value === "all" ? "" : value,
+                          };
+                        })
+                      }
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {/* <input
+                      type="text"
+                      name="user_id"
+                      value={filters.user_id}
+                      onChange={handleChange}
+                      placeholder="User ID"
+                      className="w-full border px-2 py-1 rounded"
+                    /> */}
+                    <Select
+                      value={filters?.platform}
+                      onValueChange={(value) => {
+                        setSelectedPlatformKey(value);
+                        setFilters((prev) => {
+                          return {
+                            ...prev,
+                            platform: value === "all" ? "" : value,
+                          };
+                        });
+                      }}
+                    >
+                      <SelectTrigger id="platform" className="col-span-3">
+                        <SelectValue placeholder="Select Platform" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all" key="all">
+                          All
+                        </SelectItem>
+                        {Object.keys(platformData).map((key) => (
+                          <SelectItem value={key} key={key}>
+                            {key}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={filters?.model}
+                      onValueChange={(value) => {
+                        const model = currentPlatform?.models?.find(
+                          (m: PlatformModel) => m.identifier === value
+                        );
+                        // setSelectedModel(model);
+
+                        console.log(model, "model");
+
+                        // Update model in newFinaidProfile
+                        setFilters((prev) => ({
+                          ...prev,
+                          model: model?.identifier || "",
+                        }));
+                      }}
+                    >
+                      <SelectTrigger id="model" className="col-span-3">
+                        <SelectValue placeholder="Select Model" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all" key="all">
+                          All
+                        </SelectItem>
+                        {currentPlatform?.models?.length > 0 &&
+                          currentPlatform?.models.map((model: PlatformModel) => (
+                            <SelectItem
+                              value={model.identifier}
+                              key={model.identifier}
+                            >
+                              {model.display_name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    {/* <input
+                      type="text"
+                      name="model"
+                      value={filters.model}
+                      onChange={handleChange}
+                      placeholder="Model"
+                      className="w-full border px-2 py-1 rounded"
+                    />
+                    <input
+                      type="text"
+                      name="platform"
+                      value={filters.platform}
+                      onChange={handleChange}
+                      placeholder="Platform"
+                      className="w-full border px-2 py-1 rounded"
+                    /> */}
+
+                    <div className="flex justify-end gap-2 pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setFilters({
+                            finaid_profile_id: "",
+                            status: "",
+                            user_id: "",
+                            model: "",
+                            platform: "",
+                          });
+                          setLocalLoading((prev) => !prev);
+                          // getAllFinaidProfileList();
+                          setIsOpen(false);
+                        }}
+                      >
+                        Clear
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setLocalLoading((prev) => !prev);
+                          // getAllFinaidProfileList();
+                          setIsOpen(false);
+                        }}
+                      >
+                        Apply Filter
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </Button>
+            </div>
+          </div>
+
+          <TabsContent value="apps" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Apps</CardTitle>
+                <CardDescription>
+                  Browse and install apps for your Fin(Ai)d Hub
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <MarketplaceApps />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="integrations" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Integrations</CardTitle>
+                <CardDescription>
+                  Connect with other services and platforms
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <MarketplaceIntegrations />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="installed" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Installed Apps & Integrations</CardTitle>
+                <CardDescription>
+                  Manage your installed apps and integrations
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="rounded-md border p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-md bg-primary/10 flex items-center justify-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-primary"
+                          >
+                            <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" />
+                            <path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9" />
+                            <path d="M12 3v6" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="font-medium">
+                            QuickBooks Integration
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            Connected on Oct 15, 2023
+                          </p>
+                        </div>
+                      </div>
+                      <Button variant="outline">Configure</Button>
+                    </div>
+                  </div>
+
+                  <div className="rounded-md border p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-md bg-primary/10 flex items-center justify-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-primary"
+                          >
+                            <path d="M12 2v20" />
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Payment Processing</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Connected on Nov 2, 2023
+                          </p>
+                        </div>
+                      </div>
+                      <Button variant="outline">Configure</Button>
+                    </div>
+                  </div>
+
+                  <div className="rounded-md border p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-md bg-primary/10 flex items-center justify-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-primary"
+                          >
+                            <rect width="18" height="18" x="3" y="3" rx="2" />
+                            <path d="M7 7h10" />
+                            <path d="M7 12h10" />
+                            <path d="M7 17h10" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Document Management</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Connected on Oct 28, 2023
+                          </p>
+                        </div>
+                      </div>
+                      <Button variant="outline">Configure</Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="finaidprofiles" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Finaid Profiles</CardTitle>
+                <CardDescription>
+                  Browse all Finaid Profiles under your Fin(Ai)d Hub
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <FinaidProfiles
+                  localLoading={localLoading}
+                  setLocalLoading={setLocalLoading}
+                  filters={filters}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+      <CreateFinaidProfile
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        setLocalLoading={setLocalLoading}
+      />
+    </DashboardLayout>
+  );
+}

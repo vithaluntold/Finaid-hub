@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9003:9003"
+    environment:
+      - NODE_ENV=production
+      - PORT=9003
+    volumes:
+      - ./uploads:/app/uploads  # Persist uploads
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
