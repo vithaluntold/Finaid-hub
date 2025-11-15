@@ -54,7 +54,7 @@ export function SubscriptionStats() {
               outerRadius={70}
               fill="#8884d8"
               dataKey="value"
-              label={({ name, percent }) =>
+              label={({ name, percent }: { name: any; percent: any }) =>
                 `${name} ${(percent * 100).toFixed(0)}%`
               }
             >

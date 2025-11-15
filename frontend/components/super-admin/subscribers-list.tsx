@@ -28,6 +28,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { EyeIcon, CheckCircle, XCircle, FileText, Edit } from "lucide-react";
+import { User } from "@/types";
 import { backendBaseURL } from "@/assets/constants/constant";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
@@ -176,7 +177,7 @@ export function SubscribersList({
   // const { showToast } = useToast();
   // const [allAccountingOwners, setAllAccountingOwners] = useState([]);
   const [selectedSubscriber, setSelectedSubscriber] = useState<
-    (typeof allAccountingOwners)[0] | null
+    User | null
   >(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [localLoading, setLocalLoading] = useState(false);
@@ -188,7 +189,7 @@ export function SubscribersList({
     ? allAccountingOwners?.filter((sub) => sub?.status === filterStatus)
     : allAccountingOwners;
 
-  const handleViewDetails = (subscriber: (typeof allAccountingOwners)[0]) => {
+  const handleViewDetails = (subscriber: User) => {
     setSelectedSubscriber(subscriber);
     setIsDetailsOpen(true);
   };
@@ -279,8 +280,8 @@ export function SubscribersList({
                   </TableRow>
                 );
               })
-            : subscribers?.length > 0 &&
-              subscribers.map((subscriber) => (
+            : (subscribers && subscribers.length > 0) &&
+              subscribers.map((subscriber: User) => (
                 <TableRow key={subscriber?._id}>
                   <TableCell className="hover:underline">
                     <Link href={`/super-admin/userprofile/${subscriber?._id}`}>

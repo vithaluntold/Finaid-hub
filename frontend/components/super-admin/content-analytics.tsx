@@ -58,7 +58,7 @@ export function ContentAnalytics() {
         <YAxis yAxisId="left" orientation="left" />
         <YAxis yAxisId="right" orientation="right" />
         <Tooltip
-          formatter={(value, name) => {
+          formatter={(value: any, name: any) => {
             if (name === "views") return [value.toLocaleString(), "Views"]
             return [`${value}m`, "Avg. Engagement"]
           }}

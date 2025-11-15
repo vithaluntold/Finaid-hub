@@ -4,11 +4,11 @@ import { cn } from "@/lib/utils";
 
 const Table = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLTableElement> & { overflow?: string }
+>(({ className, overflow, ...props }, ref) => (
   <div
     className={`relative w-full ${
-      props?.overflow === "none" ? "" : "overflow-auto"
+      overflow === "none" ? "" : "overflow-auto"
     }`}
   >
     <table

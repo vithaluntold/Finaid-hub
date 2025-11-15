@@ -40,7 +40,7 @@ export function RevenueChart() {
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
         <YAxis />
-        <Tooltip formatter={(value) => [`$${value}`, "Revenue"]} />
+        <Tooltip formatter={(value: any) => [`$${value}`, "Revenue"]} />
         <Legend />
         <Bar dataKey="revenue" name="Revenue" fill="#8884d8" />
       </BarChart>

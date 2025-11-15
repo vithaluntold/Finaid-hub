@@ -1,5 +1,5 @@
 import "./spinner.scss";
 
 export const SpinnerLoading = () => {
-  return <div class="lds-dual-ring"></div>;
+  return <div className="lds-dual-ring"></div>;
 };

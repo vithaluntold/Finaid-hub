@@ -15,6 +15,7 @@ import { EyeIcon, FileIcon } from "lucide-react";
 import moment from "moment";
 import Link from "next/link";
 import Skeleton from "react-loading-skeleton";
+import { Client, ClientListProps } from "@/types";
 
 const clients = [
   {
@@ -69,15 +70,15 @@ export function ClientList({
   allClients,
   isLoading,
   searchQuery,
-}) {
+}: ClientListProps) {
   const filteredClientsBase = filterStatus
-    ? allClients?.filter((client) => client.status === filterStatus)
+    ? allClients?.filter((client: Client) => client.status === filterStatus)
     : allClients;
 
   const filteredClients =
     filteredClientsBase?.length > 0
       ? filteredClientsBase?.filter(
-          (client) =>
+          (client: Client) =>
             client?.company_name
               .toLowerCase()
               .includes(searchQuery.toLowerCase()) ||
@@ -136,7 +137,7 @@ export function ClientList({
             );
           })
         ) : filteredClients?.length > 0 ? (
-          filteredClients?.map((client) => (
+          filteredClients?.map((client: Client) => (
             <TableRow key={client._id}>
               <TableCell>
                 <div className="flex items-center gap-2">

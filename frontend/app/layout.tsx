@@ -3,9 +3,7 @@ import type { Metadata } from "next";
 import { Exo_2 as Exo2 } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import { ToastProvider } from "@/components/ui/Toastprovider";
 import "react-loading-skeleton/dist/skeleton.css";
 
 const exo2 = Exo2({
@@ -33,7 +31,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ToastProvider>{children}</ToastProvider>
+          {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

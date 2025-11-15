@@ -30,7 +30,7 @@ const DatePickerInput: React.FC<Props> = ({
         format === "d-m-Y" ? "dd-MM-yyyy" : "yyyy-MM-dd"
       );
 
-      setState((prev) => ({
+      setState((prev: any) => ({
         ...prev,
         [name]: formattedDate,
       }));
@@ -44,7 +44,7 @@ const DatePickerInput: React.FC<Props> = ({
       options={{
         dateFormat: format,
       }}
-      value={defaultValue}
+      value={defaultValue || undefined}
       onChange={handleChange}
       className="border border-black-300 rounded px-2 py-2 w-full text-black font-normal text-sm"
       placeholder={placeholder}

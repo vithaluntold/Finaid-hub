@@ -49,9 +49,9 @@ export function BillingOverview() {
         <YAxis yAxisId="left" orientation="left" />
         <YAxis yAxisId="right" orientation="right" />
         <Tooltip
-          formatter={(value, name) => {
+          formatter={(value: any, name: any) => {
             if (name === "revenue") return [`$${value}`, "Revenue"];
-            return [value, "New Accounting Firms"];
+            return [value, "New Accounting Firms"];
           }}
         />
         <Legend />

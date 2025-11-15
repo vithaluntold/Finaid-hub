@@ -2,6 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
+// Type definitions
+interface AdminItem {
+  _id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  status: string;
+  created_at: string;
+}
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -53,8 +64,8 @@ export function InviteAdminList({ contentType }: ContentListProps) {
   const [selectedContent, setSelectedContent] = useState<null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [allAdminList, setAllAdminList] = useState([]);
-  const [userDetails, setUserDetails] = useState({});
+  const [allAdminList, setAllAdminList] = useState<AdminItem[]>([]);
+  const [userDetails, setUserDetails] = useState<any>({});
 
   // Filter content based on type if contentType is provided
 
@@ -103,7 +114,7 @@ export function InviteAdminList({ contentType }: ContentListProps) {
     }
   }
 
-  async function reinviteUser(id) {
+  async function reinviteUser(id: any) {
     setIsLoading(true);
     try {
       const response = await axios.post(
@@ -141,7 +152,7 @@ export function InviteAdminList({ contentType }: ContentListProps) {
 
   useEffect(() => {
     let userdata = localStorage.getItem("userDetails")
-      ? JSON.parse(localStorage.getItem("userDetails"))
+      ? JSON.parse(localStorage.getItem("userDetails") || "{}")
       : "";
     if (userdata) {
       setUserDetails(userdata);
@@ -149,10 +160,10 @@ export function InviteAdminList({ contentType }: ContentListProps) {
   }, []);
 
   useEffect(() => {
-    if (userDetails?.email) {
+    if ((userDetails as any)?.email) {
       getAllAdminList();
     }
-  }, [userDetails?.email]);
+  }, [(userDetails as any)?.email]);
 
   return (
     <>

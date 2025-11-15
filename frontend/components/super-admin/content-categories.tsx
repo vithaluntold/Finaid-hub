@@ -25,13 +25,13 @@ export function ContentCategories() {
           outerRadius={80}
           fill="#8884d8"
           dataKey="value"
-          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+          label={({ name, percent }: { name: any; percent: any }) => `${name} ${(percent * 100).toFixed(0)}%`}
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={entry.color} />
           ))}
         </Pie>
-        <Tooltip formatter={(value) => [`${value} items`, "Content Count"]} />
+        <Tooltip formatter={(value: any) => [`${value} items`, "Content Count"]} />
         <Legend />
       </PieChart>
     </ResponsiveContainer>
